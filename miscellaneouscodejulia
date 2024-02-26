@@ -1,0 +1,27 @@
+#Here is miscellaneous code that I have used for my animations. Much of this is unorganized.
+
+panic=[]; for p in primes
+       perm=1:p;
+       for m in 2:p-1
+       newperm=[];
+       for i in 1:p
+       push!(newperm,onemodulo(perm[i]*i,p));
+       end;
+       perm=newperm;
+if length(unique(perm))<p continue; end;
+       table=[];
+       for i in 1:p
+       shiftperm=[];
+       for j in 1:p
+       push!(shiftperm,onemodulo(p+perm[onemodulo(i+j,p)]-perm[i],p));
+       end;
+       push!(table,shiftperm);
+       end;
+       xx=zeros(p,p); for i in 1:p for j in 1:p xx[j,table[i][j]]+=1; end; end;
+moo=sort(eigvals(xx),by=abs);
+pop!(moo);
+pop!(moo);
+       push!(panic,[moo,p,m]);
+display([length(panic),p,m]);
+       end;
+       end;
