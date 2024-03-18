@@ -36,3 +36,56 @@ newlist=[]; for i in 1:11 push!(newlist,[]); end; for am in list if sum(am)>0 &&
 function createdic() dic=Dict([]); for i in 3:6 pink=shuffle(newlist[i]); m=rand(1:length(pink)); if length(pink)%2>0 pop!(pink); end; for j in 1:Int(length(pink)/2) dick[pink[j]]=pink[j+Int(length(pink)/2)]; dick[pink[j+Int(length(pink)/2)]]=pink[j]; end; end; return dick; end;
 
 function transfer(l,dic,matrix) mn=size(matrix)[1]; for i in 1:Int(mn/2) for j in 1:Int(mn/2) mat=zeros(Int64,2,2); for ii in 1:2 for jj in 1:2 mat[ii,jj]=matrix[onemodulo(2*i+ii+l,mn),onemodulo(2*j+jj+l,mn)]; end; end; if haskey(dic,mat) mat=dic[mat]; end; for ii in 1:2 for jj in 1:2 matrix[onemodulo(2*i+ii+l,mn),onemodulo(2*j+jj+l,mn)]=mat[ii,jj]; end; end; end; end; end;
+
+
+
+ham=40
+haha=40
+mn=40
+
+discriminator=Chain(SkipConnection(Dense(mn,mn,atan),+),SkipConnection(Dense(mn,mn,atan),+),SkipConnection(Dense(mn,mn,atan),+))
+
+datadisc=[]
+for i in 1:100
+x=randn(mn);
+push!(datadisc,x);
+end
+
+loss(x)=norm(discriminator(x)-x)^2;
+#loss(x)=norm(discriminator(x[1])-x[2])
+#loss(x,y)=norm(discriminator(x)-y)
+
+
+psdisc=Flux.params(discriminator)
+
+
+
+
+can=Animation();
+pp=mean(loss.(datadisc));
+for jj in 1:3000
+rate=0.01;
+rate*=0.99;
+if rate<0.001 rate=0.001; end;
+Flux.train!(loss,psdisc,datadisc,Descent(rate))
+pp=0.95+0.05*mean(loss.(datadisc));
+display([pp,length(datadisc),norm(Flux.params(discriminator)),jj,rate]);
+mat=[zeros(mn,mn),zeros(mn,mn),zeros(mn,mn)];
+colors=zeros(RGBA,mn,mn);
+for i in 1:3
+mat[i]=abs.(Flux.params(discriminator[i])[1]);
+mat[i]/=maximum(mat[i]);
+end;
+for j in 1:mn
+for k in 1:mn
+colors[j,k]=RGBA(mat[1][j,k],mat[2][j,k],mat[3][j,k],1);
+end;
+end;
+frame(can,heatmap(colors,title=string("loss=",string(pp)[1:6]," : norm=",string(1.0001*Float64.(norm(Flux.params(discriminator))))[1:6])));
+datadisc=[]
+for i in 1:100
+x=randn(mn);
+push!(datadisc,x);
+end;
+end;
+
