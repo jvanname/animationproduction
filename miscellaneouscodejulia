@@ -25,3 +25,14 @@ pop!(moo);
 display([length(panic),p,m]);
        end;
        end;
+
+# This is what I use to create random cellular automata.
+
+
+list=[]; for i in 0:3 for j in 0:3 for k in 0:3 for l in 0:3 push!(list,[i j;k l]); end; end; end; end;
+
+newlist=[]; for i in 1:11 push!(newlist,[]); end; for am in list if sum(am)>0 && sum(am)<12 push!(newlist[sum(am)],am); end; end;
+
+function createdic() dic=Dict([]); for i in 3:6 pink=shuffle(newlist[i]); m=rand(1:length(pink)); if length(pink)%2>0 pop!(pink); end; for j in 1:Int(length(pink)/2) dick[pink[j]]=pink[j+Int(length(pink)/2)]; dick[pink[j+Int(length(pink)/2)]]=pink[j]; end; end; return dick; end;
+
+function transfer(l,dic,matrix) mn=size(matrix)[1]; for i in 1:Int(mn/2) for j in 1:Int(mn/2) mat=zeros(Int64,2,2); for ii in 1:2 for jj in 1:2 mat[ii,jj]=matrix[onemodulo(2*i+ii+l,mn),onemodulo(2*j+jj+l,mn)]; end; end; if haskey(dic,mat) mat=dic[mat]; end; for ii in 1:2 for jj in 1:2 matrix[onemodulo(2*i+ii+l,mn),onemodulo(2*j+jj+l,mn)]=mat[ii,jj]; end; end; end; end; end;
